@@ -1,0 +1,9 @@
+How to use
+
+Make sure Cookie is valid, if not replace it
+First run getcrawl, set whatever item you want to get info about
+If you do not have category Options run jsonfromcategories
+If you want to relist you need to get additional info into the json object
+Run Dicitionaryassigncategoryalone, or image version links img in the folder
+add.js adds the chosen item
+remove.js to be done, doesnt take that long though
