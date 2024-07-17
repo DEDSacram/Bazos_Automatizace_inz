@@ -18,14 +18,14 @@ function promptUser(query) {
     });
   });
 }
-async function typeIfEmpty(selector, value) {
+async function typeIfEmpty(selector, value,page) {
   const isEmpty = await page.evaluate((selector) => {
     const element = document.querySelector(selector);
     return element && !element.value;
   }, selector);
 
   if (isEmpty) {
-    await page.type(selector, value);
+    await page.type(selector, value,page);
   }
 }
 
@@ -129,10 +129,10 @@ async function runPuppeteer(jsonDataArray) {
   ];
   
   await page.setCookie(...cookies);
-  console.log('Loaded JSON data:',jsonDataArray);
 
   for (let i = 0; i < jsonDataArray.length; i++) {
     const jsonobject = jsonDataArray[i]
+    console.log(jsonobject["nadpis"])
   await page.goto('https://deti.bazos.cz/pridat-inzerat.php');
   await page.select('select[name="rubrikyvybrat"]', jsonobject["rubrikyvybrat"]);
   await page.waitForSelector('select[name="category"]', { visible: true });
@@ -148,19 +148,19 @@ async function runPuppeteer(jsonDataArray) {
   // await page.type('input[name="heslobazar"]', '360'); // Password
 
   // Fill the 'Location' field if it's empty
-await typeIfEmpty('input[name="lokalita"]', jsonobject["lokalita"]);
+await typeIfEmpty('input[name="lokalita"]', jsonobject["lokalita"],page);
 
 // Fill the 'Name' field if it's empty
-await typeIfEmpty('input[name="jmeno"]', jsonobject["jmeno"]);
+await typeIfEmpty('input[name="jmeno"]', jsonobject["jmeno"],page);
 
 // Fill the 'Phone' field if it's empty
-await typeIfEmpty('input[name="telefoni"]', jsonobject["telefoni"]);
+await typeIfEmpty('input[name="telefoni"]', jsonobject["telefoni"],page);
 
 // Fill the 'Email' field if it's empty
-await typeIfEmpty('input[name="maili"]', jsonobject["maili"]);
+await typeIfEmpty('input[name="maili"]', jsonobject["maili"],page);
 
 // Fill the 'Password' field with a static value if it's empty
-await typeIfEmpty('input[name="heslobazar"]', '360');
+await typeIfEmpty('input[name="heslobazar"]', '360',page);
 
 
     
@@ -177,13 +177,16 @@ await typeIfEmpty('input[name="heslobazar"]', '360');
 
      // Submit the form with specific name and value
     //  await page.waitForSelector('selector', { visible: true });
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 1 second
+    await new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 1000) + 2000)); // Wait for 1 second
 
 
      await page.click('input[type="submit"][name="Submit"][value="Odeslat"]'); // Click the submit button
     
      // Wait for a response or navigation if needed
-     await page.waitForNavigation();
+    await page.goto('https://www.bazos.cz/moje-inzeraty.php', { waitUntil: 'networkidle2' });
+    //  await new Promise(resolve => setTimeout(resolve, 2000));
+    await browser.close();
+    console.log("inserted:" + jsonobject["nadpis"])
     }
   
 }
