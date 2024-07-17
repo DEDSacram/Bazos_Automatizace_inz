@@ -160,12 +160,13 @@ const path = require('path');
       }
      
 
-      const selectedNumber = 2; // Replace with your desired number
+      const selectedNumber = 999; // Replace with your desired number
       // Example usage
      
       if(selectedNumber === 999){
         const elements = await page.$$('.inzeraty.inzeratyflex');
         for (let i = 0; i < elements.length; i++) {
+            await new Promise(r => setTimeout(r, 1000));
             await collectInputValues(i);
             }
         
