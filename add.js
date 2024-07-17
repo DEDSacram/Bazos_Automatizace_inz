@@ -18,6 +18,18 @@ function promptUser(query) {
     });
   });
 }
+async function typeIfEmpty(selector, value) {
+  const isEmpty = await page.evaluate((selector) => {
+    const element = document.querySelector(selector);
+    return element && !element.value;
+  }, selector);
+
+  if (isEmpty) {
+    await page.type(selector, value);
+  }
+}
+
+
 
 // Function to load JSON data from specified folders
 async function loadJsonFromFolders(mainDir, selectedFolders) {
@@ -118,8 +130,9 @@ async function runPuppeteer(jsonDataArray) {
   
   await page.setCookie(...cookies);
   console.log('Loaded JSON data:',jsonDataArray);
-  i=0
-  const jsonobject = jsonDataArray[i]
+
+  for (let i = 0; i < jsonDataArray.length; i++) {
+    const jsonobject = jsonDataArray[i]
   await page.goto('https://deti.bazos.cz/pridat-inzerat.php');
   await page.select('select[name="rubrikyvybrat"]', jsonobject["rubrikyvybrat"]);
   await page.waitForSelector('select[name="category"]', { visible: true });
@@ -128,11 +141,26 @@ async function runPuppeteer(jsonDataArray) {
   await page.type('textarea[name="popis"]', jsonobject["popis"]); // Description
   await page.type('input[name="cena"]', jsonobject["cena"]); // Price
   await page.select('select[name="cenavyber"]', jsonobject["cenavyber"]); // Price type
-  await page.type('input[name="lokalita"]', jsonobject["lokalita"]); // Location
-  await page.type('input[name="jmeno"]', jsonobject["jmeno"]); // Name
-  await page.type('input[name="telefoni"]', jsonobject["telefoni"]); // Phone
-  await page.type('input[name="maili"]', jsonobject["maili"]); // Email
-  await page.type('input[name="heslobazar"]', '360'); // Password
+  // await page.type('input[name="lokalita"]', jsonobject["lokalita"]); // Location
+  // await page.type('input[name="jmeno"]', jsonobject["jmeno"]); // Name
+  // await page.type('input[name="telefoni"]', jsonobject["telefoni"]); // Phone
+  // await page.type('input[name="maili"]', jsonobject["maili"]); // Email
+  // await page.type('input[name="heslobazar"]', '360'); // Password
+
+  // Fill the 'Location' field if it's empty
+await typeIfEmpty('input[name="lokalita"]', jsonobject["lokalita"]);
+
+// Fill the 'Name' field if it's empty
+await typeIfEmpty('input[name="jmeno"]', jsonobject["jmeno"]);
+
+// Fill the 'Phone' field if it's empty
+await typeIfEmpty('input[name="telefoni"]', jsonobject["telefoni"]);
+
+// Fill the 'Email' field if it's empty
+await typeIfEmpty('input[name="maili"]', jsonobject["maili"]);
+
+// Fill the 'Password' field with a static value if it's empty
+await typeIfEmpty('input[name="heslobazar"]', '360');
 
 
     
@@ -149,13 +177,15 @@ async function runPuppeteer(jsonDataArray) {
 
      // Submit the form with specific name and value
     //  await page.waitForSelector('selector', { visible: true });
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 1 second
 
 
      await page.click('input[type="submit"][name="Submit"][value="Odeslat"]'); // Click the submit button
     
      // Wait for a response or navigation if needed
      await page.waitForNavigation();
+    }
+  
 }
 
 // Main function to execute the script
